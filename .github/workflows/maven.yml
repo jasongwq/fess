@@ -48,4 +48,7 @@ jobs:
       run: bash src/test/resources/before_script.sh
     - name: Run Integration Test
       run: bash src/test/resources/run.sh
-
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        path: target/releases/
