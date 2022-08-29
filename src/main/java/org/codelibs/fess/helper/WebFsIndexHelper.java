@@ -162,22 +162,42 @@ public class WebFsIndexHelper {
             }));
 
             // set included urls
-            split(includedUrlsStr, "[\r\n]").of(stream -> stream.filter(StringUtil::isNotBlank).map(String::trim).forEach(urlValue -> {
-                if (!urlValue.startsWith("#")) {
-                    crawler.addIncludeFilter(urlValue);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Included URL: {}", urlValue);
+            final AtomicBoolean urlEncodeDisabled = new AtomicBoolean(false);
+            split(includedUrlsStr, "[\r\n]").of(stream -> stream.filter(StringUtil::isNotBlank).map(String::trim).forEach(line -> {
+                if (!line.startsWith("#")) {
+                    final String urlValue;
+                    if (urlEncodeDisabled.get()) {
+                        urlValue = line;
+                        urlEncodeDisabled.set(false);
+                    } else {
+                        urlValue = systemHelper.encodeUrlFilter(line);
                     }
-                }
-            }));
-
-            // set excluded urls
-            split(excludedUrlsStr, "[\r\n]").of(stream -> stream.filter(StringUtil::isNotBlank).map(String::trim).forEach(urlValue -> {
-                if (!urlValue.startsWith("#")) {
                     crawler.addExcludeFilter(urlValue);
                     if (logger.isInfoEnabled()) {
                         logger.info("Excluded URL: {}", urlValue);
                     }
+                } else if (line.startsWith("#DISABLE_URL_ENCODE")) {
+                    urlEncodeDisabled.set(true);
+                }
+            }));
+
+            // set excluded urls
+            urlEncodeDisabled.set(false);
+            split(excludedUrlsStr, "[\r\n]").of(stream -> stream.filter(StringUtil::isNotBlank).map(String::trim).forEach(line -> {
+                if (!line.startsWith("#")) {
+                    final String urlValue;
+                    if (urlEncodeDisabled.get()) {
+                        urlValue = line;
+                        urlEncodeDisabled.set(false);
+                    } else {
+                        urlValue = systemHelper.encodeUrlFilter(line);
+                    }
+                    crawler.addExcludeFilter(urlValue);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Excluded URL: {}", urlValue);
+                    }
+                } else if (line.startsWith("#DISABLE_URL_ENCODE")) {
+                    urlEncodeDisabled.set(true);
                 }
             }));
 
