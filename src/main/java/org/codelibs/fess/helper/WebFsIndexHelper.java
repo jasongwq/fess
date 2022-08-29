@@ -172,9 +172,9 @@ public class WebFsIndexHelper {
                     } else {
                         urlValue = systemHelper.encodeUrlFilter(line);
                     }
-                    crawler.addExcludeFilter(urlValue);
+                    crawler.addIncludeFilter(urlValue);
                     if (logger.isInfoEnabled()) {
-                        logger.info("Excluded URL: {}", urlValue);
+                        logger.info("Included URL: {}", urlValue);
                     }
                 } else if (line.startsWith("#DISABLE_URL_ENCODE")) {
                     urlEncodeDisabled.set(true);
