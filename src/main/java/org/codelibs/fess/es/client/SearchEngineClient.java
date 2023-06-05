@@ -197,7 +197,7 @@ public class SearchEngineClient implements Client {
 
     protected int sizeForUpdate = 100;
 
-    protected String scrollForUpdate = "1m";
+    protected String scrollForUpdate = "20m";
 
     protected int maxConfigSyncStatusRetry = 10;
 
